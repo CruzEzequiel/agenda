@@ -8,10 +8,12 @@ import { GrillaSemanal } from './components/grillaSemanal'
 import { FiltrosYLeyenda } from './components/filtrosYLeyenda'
 import { ESTATUS_INFO } from './components/estatusInfo'
 import { EventoModal } from '../../../components/modals/eventoModal'
+import { EventoVistaModal } from '../../../components/modals/eventoVistaModal'
 
 type ModalState =
   | { tipo: 'cerrado' }
   | { tipo: 'crear'; fecha?: string; hora?: string }
+  | { tipo: 'ver'; evento: EventoAgenda }
   | { tipo: 'editar'; evento: EventoAgenda }
 
 function RibbonCommand({
@@ -163,7 +165,7 @@ export default function AgendaView() {
                 rangoInicio={0}
                 rangoFin={24 * 60}
                 hoy={hoy}
-                onSelectEvento={(e) => setModal({ tipo: 'editar', evento: e })}
+                onSelectEvento={(e) => setModal({ tipo: 'ver', evento: e })}
                 onSelectSlot={(fecha, hora) => setModal({ tipo: 'crear', fecha, hora })}
               />
             </div>
@@ -171,7 +173,15 @@ export default function AgendaView() {
         </div>
       </div>
 
-      {modal.tipo !== 'cerrado' && (
+      {modal.tipo === 'ver' && (
+        <EventoVistaModal
+          evento={modal.evento}
+          onClose={() => setModal({ tipo: 'cerrado' })}
+          onEditar={() => setModal({ tipo: 'editar', evento: modal.evento })}
+        />
+      )}
+
+      {(modal.tipo === 'crear' || modal.tipo === 'editar') && (
         <EventoModal
           evento={modal.tipo === 'editar' ? modal.evento : null}
           fechaInicial={modal.tipo === 'crear' ? modal.fecha : undefined}
