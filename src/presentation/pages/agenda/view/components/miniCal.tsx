@@ -22,59 +22,55 @@ export function MiniCal({
 
   return (
     <div className="select-none">
-      <div className="flex items-center justify-between px-1 mb-2">
+      <div className="flex items-center justify-between pb-1.5">
         <button
           onClick={() => setMesVista(({ y, m }) => (m === 0 ? { y: y - 1, m: 11 } : { y, m: m - 1 }))}
-          className="flex h-6 w-6 items-center justify-center rounded hover:bg-slate-100"
+          className="flex h-5 w-5 items-center justify-center text-zinc-400 hover:bg-white/10"
         >
-          <ChevronLeft size={13} className="text-slate-400" />
+          <ChevronLeft size={12} />
         </button>
-        <span className="text-[11px] font-semibold text-slate-700">
+        <span className="text-2xs font-semibold text-zinc-100">
           {MESES_ES[mesVista.m]} {mesVista.y}
         </span>
         <button
           onClick={() => setMesVista(({ y, m }) => (m === 11 ? { y: y + 1, m: 0 } : { y, m: m + 1 }))}
-          className="flex h-6 w-6 items-center justify-center rounded hover:bg-slate-100"
+          className="flex h-5 w-5 items-center justify-center text-zinc-400 hover:bg-white/10"
         >
-          <ChevronRight size={13} className="text-slate-400" />
+          <ChevronRight size={12} />
         </button>
       </div>
 
-      <div className="grid grid-cols-7 mb-1">
+      <div className="grid grid-cols-7">
         {DIAS_SEMANA_CORTO.map((d, i) => (
-          <div key={i} className="flex items-center justify-center text-[10px] font-semibold text-slate-400 h-6">
+          <div key={i} className="flex h-5 items-center justify-center text-2xs font-semibold text-violet-300">
             {d}
           </div>
         ))}
       </div>
 
       <div className="grid grid-cols-7">
-        {celdas.map((dia, i) => {
+        {celdas.map((dia) => {
           const iso = isoFecha(dia)
           const esMes = dia.getMonth() === mesVista.m
           const esHoy = iso === hoyIso
           const lunes = isoFecha(lunesDe(dia))
           const esSemana = lunes === semanaActivaLunes
-          const esLunes = i % 7 === 0
-          const esDom = i % 7 === 6
 
           return (
             <button
               key={iso}
               onClick={() => onSelectSemana(lunesDe(dia))}
               className={[
-                'flex h-7 items-center justify-center text-[11px] transition-colors',
-                esLunes ? 'rounded-l-full' : '',
-                esDom ? 'rounded-r-full' : '',
-                esSemana ? 'bg-slate-900/8' : 'hover:bg-slate-100',
+                'flex h-6 items-center justify-center text-2xs transition-colors',
+                esSemana ? 'bg-violet-500/25' : 'hover:bg-white/10',
               ].join(' ')}
             >
               <span
                 className={[
-                  'flex h-5 w-5 items-center justify-center rounded-full font-medium',
-                  esHoy ? 'bg-blue-600 text-white text-[11px]' : '',
-                  !esHoy && esMes ? 'text-slate-700' : '',
-                  !esHoy && !esMes ? 'text-slate-300' : '',
+                  'flex h-4 w-4 items-center justify-center text-2xs font-medium',
+                  esHoy ? 'bg-violet-500 text-white' : '',
+                  !esHoy && esMes ? 'text-zinc-200' : '',
+                  !esHoy && !esMes ? 'text-zinc-600' : '',
                 ].join(' ')}
               >
                 {dia.getDate()}

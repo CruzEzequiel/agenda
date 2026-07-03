@@ -54,24 +54,24 @@ export function GrillaSemanal({
   }, [semanaKey, rangoInicio, rangoFin, ahoraOffset])
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-white">
-      <div className="flex flex-shrink-0 border-b border-slate-200 overflow-visible">
-        <div className="flex-shrink-0 border-r border-slate-200" style={{ width: COL_HORA_W }} />
+    <div className="flex min-h-0 flex-1 flex-col bg-zinc-900">
+      <div className="flex flex-shrink-0 overflow-visible border-b border-zinc-700 bg-zinc-800">
+        <div className="flex-shrink-0 border-r border-zinc-700 bg-zinc-800" style={{ width: COL_HORA_W }} />
         {dias.map((dia, i) => {
           const iso = isoFecha(dia)
           const esHoy = iso === hoy
           return (
             <div
               key={iso}
-              className={`flex flex-1 flex-col items-center justify-center border-r border-slate-200 py-2 pb-3 last:border-r-0 ${esHoy ? 'bg-blue-50/30' : ''}`}
+              className={`flex flex-1 flex-col items-center justify-center border-r border-zinc-700 py-2 pb-3 last:border-r-0 ${esHoy ? 'bg-violet-500/25' : ''}`}
             >
-              <span className={`text-[10px] font-semibold uppercase tracking-widest ${esHoy ? 'text-blue-600' : 'text-slate-400'}`}>
+              <span className={`text-2xs font-semibold uppercase ${esHoy ? 'text-violet-200' : 'text-zinc-400'}`}>
                 {DIAS_GRILLA[i]}
               </span>
               <span
                 className={[
-                  'mt-1 flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold',
-                  esHoy ? 'bg-blue-600 text-white shadow-md' : 'text-slate-800',
+                  'mt-1 flex h-8 w-8 items-center justify-center text-xs font-bold',
+                  esHoy ? 'bg-violet-500 text-white' : 'text-zinc-100',
                 ].join(' ')}
               >
                 {dia.getDate()}
@@ -81,13 +81,13 @@ export function GrillaSemanal({
         })}
       </div>
 
-      <div ref={scrollRef} className="flex flex-1 min-h-0 overflow-y-auto">
-        <div className="relative flex-shrink-0 border-r border-slate-200" style={{ width: COL_HORA_W, height: totalPx }}>
+      <div ref={scrollRef} className="flex min-h-0 flex-1 overflow-y-auto">
+        <div className="relative flex-shrink-0 border-r border-zinc-700 bg-zinc-800" style={{ width: COL_HORA_W, height: totalPx }}>
           <div className="relative" style={{ height: totalPx }}>
             {horas.map((m) => (
               <div
                 key={m}
-                className="absolute right-2 text-[10px] text-slate-400 leading-none select-none"
+                className="absolute right-2 select-none text-2xs leading-none text-zinc-400"
                 style={{ top: (m - rangoInicio) * PX_POR_MIN - 6 }}
               >
                 {m < rangoFin ? fmtHoraMin(m) : ''}
@@ -96,7 +96,7 @@ export function GrillaSemanal({
           </div>
         </div>
 
-        <div className="flex flex-1 min-w-0">
+        <div className="flex min-w-0 flex-1">
           {dias.map((dia) => {
             const iso = isoFecha(dia)
             const esHoy = iso === hoy
@@ -106,7 +106,10 @@ export function GrillaSemanal({
             return (
               <div
                 key={iso}
-                className={`relative flex flex-1 flex-col border-r border-slate-200 last:border-r-0 ${esHoy ? 'bg-blue-50/30' : ''}`}
+                className={[
+                  'relative flex flex-1 flex-col border-r border-zinc-700 last:border-r-0',
+                  esHoy ? 'bg-violet-500/10' : dia.getDay() === 0 || dia.getDay() === 6 ? 'bg-zinc-800/80' : 'bg-zinc-900',
+                ].join(' ')}
                 style={{ height: totalPx }}
               >
                 <div
@@ -135,7 +138,7 @@ export function GrillaSemanal({
                 >
                   {hoverSlot?.fecha === iso && (
                     <div
-                      className="pointer-events-none absolute left-0 right-0 z-[1] border-y border-blue-200 bg-blue-50/70"
+                      className="pointer-events-none absolute left-0 right-0 z-[1] border-y border-violet-400/50 bg-violet-400/15"
                       style={{
                         top: (hoverSlot.min - rangoInicio) * PX_POR_MIN,
                         height: 15 * PX_POR_MIN,
@@ -146,25 +149,25 @@ export function GrillaSemanal({
                   {horas.map((m) => (
                     <div
                       key={m}
-                      className="absolute left-0 right-0 border-t border-slate-100"
+                      className="absolute left-0 right-0 border-t border-zinc-700/80"
                       style={{ top: (m - rangoInicio) * PX_POR_MIN }}
                     />
                   ))}
                   {horas.slice(0, -1).map((m) => (
                     <div
                       key={`h-${m}`}
-                      className="absolute left-0 right-0 border-t border-dashed border-slate-100"
+                      className="absolute left-0 right-0 border-t border-dashed border-zinc-800"
                       style={{ top: (m - rangoInicio) * PX_POR_MIN + 30 * PX_POR_MIN }}
                     />
                   ))}
 
                   {ahoraAqui && (
                     <div
-                      className="absolute left-0 right-0 z-10 flex items-center pointer-events-none"
+                      className="pointer-events-none absolute left-0 right-0 z-10 flex items-center"
                       style={{ top: ahoraOffset * PX_POR_MIN }}
                     >
-                      <div className="h-2 w-2 flex-shrink-0 rounded-full bg-blue-600 -ml-1 shadow-sm" />
-                      <div className="flex-1 border-t border-blue-500" />
+                      <div className="-ml-1 h-2 w-2 flex-shrink-0 rounded-full bg-violet-400" />
+                      <div className="flex-1 border-t border-violet-400" />
                     </div>
                   )}
 

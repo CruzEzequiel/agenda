@@ -23,17 +23,17 @@ export function EventoBloque({
   return (
     <div
       onClick={(e) => { e.stopPropagation(); onSelect(evento) }}
-      className={`absolute inset-x-1 cursor-pointer overflow-hidden rounded-md border-l-2 px-2 transition-opacity hover:opacity-80 ${col.pill} ${col.border}`}
+      className={`absolute inset-x-1 cursor-pointer overflow-hidden border border-l-4 border-zinc-200 px-2 transition-opacity hover:opacity-80 ${col.pill} ${col.border}`}
       style={{ top, height, paddingTop: 3, paddingBottom: 3 }}
     >
       {corto ? (
-        <p className={`text-[10px] font-semibold leading-none truncate ${col.text}`}>
+        <p className={`text-2xs font-semibold leading-none truncate ${col.text}`}>
           {fmtHoraISO(evento.fecha_inicio)} {evento.titulo}
         </p>
       ) : (
         <>
-          <p className={`text-[10px] font-semibold leading-tight truncate ${col.text}`}>{evento.titulo}</p>
-          <p className={`text-[10px] leading-none opacity-70 ${col.text}`}>
+          <p className={`text-2xs font-semibold leading-tight truncate ${col.text}`}>{evento.titulo}</p>
+          <p className={`text-2xs leading-none opacity-70 ${col.text}`}>
             {fmtHoraISO(evento.fecha_inicio)} – {fmtHoraISO(evento.fecha_fin)}
           </p>
         </>

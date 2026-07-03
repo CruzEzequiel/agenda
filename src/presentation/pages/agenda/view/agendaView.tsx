@@ -1,30 +1,48 @@
-import { useState, useMemo, useEffect } from 'react'
-import {
-  CalendarDays,
-  ChevronLeft,
-  ChevronRight,
-  Clock3,
-  FilePlus2,
-  Filter,
-  PanelLeft,
-  Plus,
-  Printer,
-  RefreshCcw,
-  Search,
-  Settings,
-} from 'lucide-react'
+import { useState, useMemo, useEffect, type ReactNode } from 'react'
+import { ChevronLeft, ChevronRight, Clock3, Plus, RefreshCcw } from 'lucide-react'
 import type { EventoAgenda, EstatusEvento } from '../../../../domain/entities/db/local/evento'
 import { listarEventos, crearEvento, actualizarEvento, eliminarEvento } from '../../../../infrastructure/data/local/eventos'
 import { isoFecha, lunesDe, addDias, MESES_ES } from '../../../../infrastructure/useCases/agendaHelpers'
 import { MiniCal } from './components/miniCal'
 import { GrillaSemanal } from './components/grillaSemanal'
-import { FiltrosYLeyenda, ESTATUS_INFO } from './components/filtrosYLeyenda'
+import { FiltrosYLeyenda } from './components/filtrosYLeyenda'
+import { ESTATUS_INFO } from './components/estatusInfo'
 import { EventoModal } from '../../../components/modals/eventoModal'
 
 type ModalState =
   | { tipo: 'cerrado' }
   | { tipo: 'crear'; fecha?: string; hora?: string }
   | { tipo: 'editar'; evento: EventoAgenda }
+
+function RibbonCommand({
+  icon,
+  label,
+  hint,
+  active = false,
+  onClick,
+}: {
+  icon: ReactNode
+  label: string
+  hint?: string
+  active?: boolean
+  onClick?: () => void
+}) {
+  return (
+    <button
+      type="button"
+      title={hint ?? label}
+      onClick={onClick}
+      className={[
+        'flex h-9 items-center justify-center gap-1.5 px-2.5 text-xs font-medium transition-colors hover:bg-white/10',
+        label ? '' : 'w-9 px-0',
+        active ? 'bg-violet-500/20 text-violet-100 hover:bg-violet-500/30' : 'text-zinc-200',
+      ].join(' ')}
+    >
+      {icon}
+      {label && <span className="text-xs">{label}</span>}
+    </button>
+  )
+}
 
 export default function AgendaView() {
   const [semanaLunes, setSemanaLunes] = useState(() => lunesDe(new Date()))
@@ -42,7 +60,11 @@ export default function AgendaView() {
   const toggleFiltro = (e: EstatusEvento) =>
     setFiltrosActivos((prev) => {
       const next = new Set(prev)
-      next.has(e) ? next.delete(e) : next.add(e)
+      if (next.has(e)) {
+        next.delete(e)
+      } else {
+        next.add(e)
+      }
       return next
     })
 
@@ -65,7 +87,6 @@ export default function AgendaView() {
   })()
 
   const esEstaSemana = isoFecha(semanaLunes) === isoFecha(lunesDe(new Date()))
-  const totalVisibles = Object.values(eventosPorDia).reduce((acc, dia) => acc + dia.length, 0)
 
   function handleGuardar(input: Omit<EventoAgenda, 'id'> & { id?: string }) {
     if (input.id) {
@@ -86,54 +107,62 @@ export default function AgendaView() {
 
   return (
     <>
-      <div className="flex min-h-0 flex-1 flex-col gap-5 p-5">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-semibold text-slate-900">Agenda</h1>
-            <p className="text-sm text-slate-400">Tu agenda personal semanal</p>
-          </div>
-          <button
+      <div className="flex min-h-0 flex-1 flex-col bg-zinc-950 text-zinc-800">
+        <div className="flex flex-shrink-0 items-center gap-3 border-b border-black bg-neutral-950 px-2 py-1.5 shadow-sm">
+          <RibbonCommand
+            icon={<Plus size={14} />}
+            label="Nuevo"
+            hint="Crear un evento"
+            active
             onClick={() => setModal({ tipo: 'crear' })}
-            className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-700"
-          >
-            <Plus size={14} /> Nuevo evento
-          </button>
+          />
+
+          <div className="h-5 w-px bg-white/20" />
+
+          <div className="flex items-center gap-0.5">
+            <RibbonCommand
+              icon={<ChevronLeft size={14} />}
+              label=""
+              hint="Semana anterior"
+              onClick={() => setSemanaLunes((d) => addDias(d, -7))}
+            />
+            <RibbonCommand
+              icon={<Clock3 size={14} />}
+              label="Hoy"
+              hint="Volver a la semana actual"
+              active={esEstaSemana}
+              onClick={() => setSemanaLunes(lunesDe(new Date()))}
+            />
+            <RibbonCommand
+              icon={<ChevronRight size={14} />}
+              label=""
+              hint="Semana siguiente"
+              onClick={() => setSemanaLunes((d) => addDias(d, 7))}
+            />
+          </div>
+
+          <div className="h-5 w-px bg-white/20" />
+
+          <RibbonCommand icon={<RefreshCcw size={14} />} label="Recargar" hint="Recargar eventos" onClick={() => setEventos(listarEventos())} />
+
+          <div className="h-5 w-px bg-white/20" />
+
+          <div className="w-48">
+            <FiltrosYLeyenda activos={filtrosActivos} onToggle={toggleFiltro} />
+          </div>
+
+          <span className="ml-auto border-l border-white/20 pl-3 text-xs font-semibold text-zinc-200">{labelSemana}</span>
         </div>
 
-        <div className="flex min-h-0 flex-1 rounded-xl border border-slate-200 bg-white overflow-hidden">
-          <aside className="flex w-52 flex-shrink-0 flex-col overflow-y-auto border-r border-slate-200 px-4 py-4">
+        <div className="flex min-h-0 flex-1 bg-zinc-900">
+          <aside className="flex w-52 flex-shrink-0 flex-col overflow-y-auto border-r border-zinc-700 bg-zinc-900 px-3 py-3">
             <MiniCal semanaRef={semanaLunes} onSelectSemana={setSemanaLunes} />
-            <div className="mt-5">
-              <FiltrosYLeyenda activos={filtrosActivos} onToggle={toggleFiltro} />
-            </div>
           </aside>
 
-          <section className="flex min-h-0 flex-1 flex-col">
-            <div className="flex flex-shrink-0 items-center justify-between border-b border-slate-200 px-5 py-3">
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setSemanaLunes((d) => addDias(d, -7))}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
-                >
-                  <ChevronLeft size={14} className="text-slate-500" />
-                </button>
-                <button
-                  onClick={() => setSemanaLunes((d) => addDias(d, 7))}
-                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-slate-200 hover:bg-slate-50 transition-colors"
-                >
-                  <ChevronRight size={14} className="text-slate-500" />
-                </button>
-                <span className="ml-1 text-sm font-semibold text-slate-900">{labelSemana}</span>
-                {!esEstaSemana && (
-                  <button
-                    onClick={() => setSemanaLunes(lunesDe(new Date()))}
-                    className="ml-1 rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 hover:bg-slate-50 transition-colors"
-                  >
-                    Hoy
-                  </button>
-                )}
-              </div>
-              <p className="text-xs text-slate-400">00:00 a 24:00</p>
+          <section className="flex min-h-0 flex-1 flex-col bg-zinc-900">
+            <div className="flex flex-shrink-0 items-center justify-between border-b border-zinc-700 bg-zinc-800 px-3 py-1.5">
+              <p className="text-xs font-semibold text-zinc-100">{labelSemana}</p>
+              <p className="text-xs font-medium text-violet-300">00:00 a 24:00</p>
             </div>
 
             <div className="flex min-h-0 flex-1 overflow-x-hidden">

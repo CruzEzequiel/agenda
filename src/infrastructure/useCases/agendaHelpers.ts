@@ -54,10 +54,10 @@ export const MESES_ES = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 
 export function colorEstatus(estatus: EstatusEvento): { pill: string; text: string; border: string } {
   switch (estatus) {
     case 'pendiente':
-      return { pill: 'bg-blue-50', text: 'text-blue-800', border: 'border-l-blue-400' }
+      return { pill: 'bg-amber-50', text: 'text-amber-800', border: 'border-l-amber-400' }
     case 'confirmado':
       return { pill: 'bg-emerald-100', text: 'text-emerald-800', border: 'border-l-emerald-500' }
     case 'cancelado':
-      return { pill: 'bg-red-50', text: 'text-red-700', border: 'border-l-red-500' }
+      return { pill: 'bg-rose-50', text: 'text-rose-700', border: 'border-l-rose-500' }
   }
 }
