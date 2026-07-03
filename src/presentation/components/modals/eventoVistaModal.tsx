@@ -18,11 +18,11 @@ export function EventoVistaModal({ evento, onClose, onEditar }: EventoVistaModal
   const col = colorEstatus(evento.estatus)
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center md:items-center md:p-4">
       <div className="absolute inset-0 bg-zinc-950/70 backdrop-blur-[2px]" onClick={onClose} />
 
-      <div className="relative z-10 flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-t-xl border border-zinc-600 bg-zinc-800 shadow-2xl shadow-black/50 sm:max-h-[90vh] sm:rounded-md">
-        <div className="mx-auto mt-2 h-1 w-10 flex-shrink-0 rounded-full bg-zinc-600 sm:hidden" />
+      <div className="relative z-10 flex max-h-[85vh] w-full flex-col overflow-hidden rounded-t-xl border border-zinc-600 bg-zinc-800 shadow-2xl shadow-black/50 md:max-h-[90vh] md:max-w-md md:rounded-md">
+        <div className="mx-auto mt-2 h-1 w-10 flex-shrink-0 rounded-full bg-zinc-600 md:hidden" />
         <div className="relative flex items-center justify-between border-b border-zinc-700 bg-zinc-800 px-5 py-3">
           <p className="pr-14 text-xs font-semibold leading-snug text-zinc-100">{evento.titulo}</p>
           <div className="absolute right-3 top-2.5 flex items-center gap-1">
