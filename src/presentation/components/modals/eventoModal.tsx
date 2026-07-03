@@ -82,10 +82,11 @@ export function EventoModal({ evento, fechaInicial, horaInicial, onClose, onGuar
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4">
       <div className="absolute inset-0 bg-zinc-950/70 backdrop-blur-[2px]" onClick={onClose} />
 
-      <div className="relative z-10 flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-md border border-zinc-600 bg-zinc-800 shadow-2xl shadow-black/50">
+      <div className="relative z-10 flex max-h-[85vh] w-full max-w-md flex-col overflow-hidden rounded-t-xl border border-zinc-600 bg-zinc-800 shadow-2xl shadow-black/50 sm:max-h-[90vh] sm:rounded-md">
+        <div className="mx-auto mt-2 h-1 w-10 flex-shrink-0 rounded-full bg-zinc-600 sm:hidden" />
         <div className="relative border-b border-zinc-700 bg-zinc-800 px-5 py-3">
           <button onClick={onClose} className="absolute right-3 top-3 rounded-md p-1 hover:bg-white/10 transition-colors">
             <X size={14} className="text-zinc-400" />
@@ -106,7 +107,7 @@ export function EventoModal({ evento, fechaInicial, horaInicial, onClose, onGuar
             />
           </div>
 
-          <div className="flex gap-3">
+          <div className="flex flex-col gap-3 sm:flex-row">
             <div className="flex-1">
               <label className="text-2xs font-semibold uppercase text-zinc-400">Fecha</label>
               <input

@@ -8,25 +8,30 @@ const DIAS_GRILLA = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sáb
 
 export function GrillaSemanal({
   lunes,
+  diaUnico,
   eventosPorDia,
   rangoInicio,
   rangoFin,
   hoy,
   onSelectEvento,
   onSelectSlot,
+  onSwipeDia,
 }: {
   lunes: Date
+  diaUnico?: Date
   eventosPorDia: Record<string, EventoAgenda[]>
   rangoInicio: number
   rangoFin: number
   hoy: string
   onSelectEvento: (e: EventoAgenda) => void
   onSelectSlot: (fecha: string, hora: string) => void
+  onSwipeDia?: (direccion: 1 | -1) => void
 }) {
   const [hoverSlot, setHoverSlot] = useState<{ fecha: string; min: number } | null>(null)
   const totalMin = rangoFin - rangoInicio
   const totalPx = totalMin * PX_POR_MIN
-  const dias = Array.from({ length: 7 }, (_, i) => addDias(lunes, i))
+  const dias = diaUnico ? [diaUnico] : Array.from({ length: 7 }, (_, i) => addDias(lunes, i))
+  const diasGrillaLabels = diaUnico ? [DIAS_GRILLA[diaUnico.getDay() === 0 ? 6 : diaUnico.getDay() - 1]] : DIAS_GRILLA
 
   const horas: number[] = []
   for (let m = rangoInicio; m <= rangoFin; m += 60) horas.push(m)
@@ -36,6 +41,7 @@ export function GrillaSemanal({
   const ahoraOffset = ahoraMin - rangoInicio
   const scrollRef = useRef<HTMLDivElement | null>(null)
   const semanaKey = isoFecha(lunes)
+  const touchStartX = useRef<number | null>(null)
 
   const slotOcupadoPorEvento = (min: number, eventos: EventoAgenda[]) =>
     eventos.some((e) => {
@@ -54,7 +60,20 @@ export function GrillaSemanal({
   }, [semanaKey, rangoInicio, rangoFin, ahoraOffset])
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col bg-zinc-900">
+    <div
+      className="flex min-h-0 flex-1 flex-col bg-zinc-900"
+      onTouchStart={(e) => {
+        if (!onSwipeDia) return
+        touchStartX.current = e.touches[0]?.clientX ?? null
+      }}
+      onTouchEnd={(e) => {
+        if (!onSwipeDia || touchStartX.current === null) return
+        const dx = (e.changedTouches[0]?.clientX ?? 0) - touchStartX.current
+        touchStartX.current = null
+        if (Math.abs(dx) < 50) return
+        onSwipeDia(dx < 0 ? 1 : -1)
+      }}
+    >
       <div className="flex flex-shrink-0 overflow-visible border-b border-zinc-700 bg-zinc-800">
         <div className="flex-shrink-0 border-r border-zinc-700 bg-zinc-800" style={{ width: COL_HORA_W }} />
         {dias.map((dia, i) => {
@@ -66,7 +85,7 @@ export function GrillaSemanal({
               className={`flex flex-1 flex-col items-center justify-center border-r border-zinc-700 py-2 pb-3 last:border-r-0 ${esHoy ? 'bg-violet-500/25' : ''}`}
             >
               <span className={`text-2xs font-semibold uppercase ${esHoy ? 'text-violet-200' : 'text-zinc-400'}`}>
-                {DIAS_GRILLA[i]}
+                {diasGrillaLabels[i]}
               </span>
               <span
                 className={[
