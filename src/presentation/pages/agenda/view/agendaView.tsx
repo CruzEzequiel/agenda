@@ -1,8 +1,8 @@
-import { useState, useMemo, useEffect, type ReactNode } from 'react'
+import { useState, useMemo, type ReactNode } from 'react'
 import { ChevronLeft, ChevronRight, Clock3, Plus, RefreshCcw } from 'lucide-react'
 import type { EventoAgenda, EstatusEvento } from '../../../../domain/entities/db/local/evento'
-import { listarEventos, crearEvento, actualizarEvento, eliminarEvento } from '../../../../infrastructure/data/local/eventos'
 import { isoFecha, lunesDe, addDias, MESES_ES } from '../../../../infrastructure/useCases/agendaHelpers'
+import { useEventos } from '../../../hooks/useEventos'
 import { MiniCal } from './components/miniCal'
 import { GrillaSemanal } from './components/grillaSemanal'
 import { FiltrosYLeyenda } from './components/filtrosYLeyenda'
@@ -46,16 +46,12 @@ function RibbonCommand({
 
 export default function AgendaView() {
   const [semanaLunes, setSemanaLunes] = useState(() => lunesDe(new Date()))
-  const [eventos, setEventos] = useState<EventoAgenda[]>([])
+  const { eventos, cargando, error, recargar, guardar, eliminar } = useEventos()
   const [modal, setModal] = useState<ModalState>({ tipo: 'cerrado' })
   const [filtrosActivos, setFiltrosActivos] = useState<Set<EstatusEvento>>(
     () => new Set(ESTATUS_INFO.map((e) => e.key)),
   )
   const hoy = isoFecha(new Date())
-
-  useEffect(() => {
-    setEventos(listarEventos())
-  }, [])
 
   const toggleFiltro = (e: EstatusEvento) =>
     setFiltrosActivos((prev) => {
@@ -88,20 +84,13 @@ export default function AgendaView() {
 
   const esEstaSemana = isoFecha(semanaLunes) === isoFecha(lunesDe(new Date()))
 
-  function handleGuardar(input: Omit<EventoAgenda, 'id'> & { id?: string }) {
-    if (input.id) {
-      const actualizado = actualizarEvento({ ...input, id: input.id })
-      setEventos((prev) => prev.map((e) => (e.id === actualizado.id ? actualizado : e)))
-    } else {
-      const creado = crearEvento(input)
-      setEventos((prev) => [...prev, creado])
-    }
+  async function handleGuardar(input: Omit<EventoAgenda, 'id'> & { id?: string }) {
+    await guardar(input)
     setModal({ tipo: 'cerrado' })
   }
 
-  function handleEliminar(id: string) {
-    eliminarEvento(id)
-    setEventos((prev) => prev.filter((e) => e.id !== id))
+  async function handleEliminar(id: string) {
+    await eliminar(id)
     setModal({ tipo: 'cerrado' })
   }
 
@@ -143,13 +132,15 @@ export default function AgendaView() {
 
           <div className="h-5 w-px bg-white/20" />
 
-          <RibbonCommand icon={<RefreshCcw size={14} />} label="Recargar" hint="Recargar eventos" onClick={() => setEventos(listarEventos())} />
+          <RibbonCommand icon={<RefreshCcw size={14} className={cargando ? 'animate-spin' : ''} />} label="Recargar" hint="Recargar eventos" onClick={() => recargar()} />
 
           <div className="h-5 w-px bg-white/20" />
 
           <div className="w-48">
             <FiltrosYLeyenda activos={filtrosActivos} onToggle={toggleFiltro} />
           </div>
+
+          {error && <span className="text-xs font-medium text-rose-400">{error}</span>}
 
           <span className="ml-auto border-l border-white/20 pl-3 text-xs font-semibold text-zinc-200">{labelSemana}</span>
         </div>

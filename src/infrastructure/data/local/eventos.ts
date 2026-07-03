@@ -1,4 +1,5 @@
 import type { EventoAgenda } from '../../../domain/entities/db/local/evento'
+import type { EventosRepository } from '../../../domain/repositories/eventosRepository'
 
 const KEY = 'agenda:eventos'
 
@@ -16,21 +17,26 @@ function escribir(eventos: EventoAgenda[]): void {
   localStorage.setItem(KEY, JSON.stringify(eventos))
 }
 
-export function listarEventos(): EventoAgenda[] {
-  return leer()
-}
+// Implementación basada en localStorage. El día que exista una base de
+// datos real, se reemplaza por otra clase que cumpla EventosRepository
+// (ej. hablando con un backend por fetch) sin tocar el resto de la app.
+export const eventosLocalStorageRepository: EventosRepository = {
+  async listar() {
+    return leer()
+  },
 
-export function crearEvento(input: Omit<EventoAgenda, 'id'>): EventoAgenda {
-  const evento: EventoAgenda = { ...input, id: crypto.randomUUID() }
-  escribir([...leer(), evento])
-  return evento
-}
+  async crear(input) {
+    const evento: EventoAgenda = { ...input, id: crypto.randomUUID() }
+    escribir([...leer(), evento])
+    return evento
+  },
 
-export function actualizarEvento(evento: EventoAgenda): EventoAgenda {
-  escribir(leer().map((e) => (e.id === evento.id ? evento : e)))
-  return evento
-}
+  async actualizar(evento) {
+    escribir(leer().map((e) => (e.id === evento.id ? evento : e)))
+    return evento
+  },
 
-export function eliminarEvento(id: string): void {
-  escribir(leer().filter((e) => e.id !== id))
+  async eliminar(id) {
+    escribir(leer().filter((e) => e.id !== id))
+  },
 }
